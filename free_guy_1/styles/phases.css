@@ -1,0 +1,57 @@
+/* Phase Transition Effects */
+.phase-transition {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #e63946;
+    font-size: 72px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #000, 0 0 20px #4cc9f0;
+    opacity: 0;
+    z-index: 1000;
+    transition: opacity 0.5s, transform 0.5s;
+    pointer-events: none;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+}
+
+.phase-transition.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* Boss Defeat Effects */
+.boss-defeat {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(76, 201, 240, 0.2);
+    z-index: 800;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.boss-defeat.show {
+    opacity: 1;
+}
+
+.boss-reward {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 36px;
+    text-align: center;
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.boss-reward.show {
+    opacity: 1;
+}
