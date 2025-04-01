@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Warfare Royale</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Hero Section -->
+    <section class="parallax h-screen flex items-center justify-center" 
+             style="background-image: url('https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg')">
+        <div class="text-center">
+            <h1 class="text-6xl font-bold mb-6 text-red-500 drop-shadow-lg">URBAN WARFARE</h1>
+            <p class="text-xl mb-8">GTA meets Warzone Battle Royale</p>
+            <button id="startBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105">
+                ENTER BATTLE <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Game Features -->
+    <section class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold mb-12 text-center">WARZONE FEATURES</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <i class="fas fa-map-marked-alt text-red-500 text-4xl mb-4"></i>
+                    <h3 class="text-2xl font-semibold mb-3">Open World</h3>
+                    <p>Massive 10km² map with urban environments, forests and military bases</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <i class="fas fa-fighter-jet text-red-500 text-4xl mb-4"></i>
+                    <h3 class="text-2xl font-semibold mb-3">Vehicles</h3>
+                    <p>Drive tanks, helicopters and sports cars with realistic physics</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <i class="fas fa-users text-red-500 text-4xl mb-4"></i>
+                    <h3 class="text-2xl font-semibold mb-3">100-Player Battles</h3>
+                    <p>Massive online battles with squad-based gameplay</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Canvas (initially hidden) -->
+    <canvas id="gameCanvas" width="1200" height="800" style="display: none;"></canvas>
+
+    <!-- Game UI (initially hidden) -->
+    <div class="health-bar" style="display: none;">
+        <div class="health-fill" id="healthBar"></div>
+    </div>
+    <div class="ammo-counter" id="ammoCounter" style="display: none;">30/30</div>
+    <div class="minimap" id="miniMap" style="display: none;"></div>
+    <div class="score-display" id="scoreDisplay" style="display: none;">0</div>
+    <button id="muteButton" class="mute-button" style="display: none;">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <script src="scripts/game.js"></script>
+    <script>
+        document.getElementById('startBtn').addEventListener('click', () => {
+            // Redirect to character selection
+            window.location.href = 'select.html';
+        });
+
+        // Check if coming from character selection
+        if (localStorage.getItem('selectedCharacter')) {
+            // Hide landing page elements
+            document.querySelector('section.parallax').style.display = 'none';
+            document.querySelector('section.py-20').style.display = 'none';
+            
+            // Show game elements
+            document.getElementById('gameCanvas').style.display = 'block';
+            document.querySelector('.health-bar').style.display = 'block';
+            document.querySelector('.ammo-counter').style.display = 'block';
+            document.querySelector('.minimap').style.display = 'block';
+            document.getElementById('scoreDisplay').style.display = 'block';
+            document.getElementById('muteButton').style.display = 'block';
+
+            // Mute button functionality
+            const muteButton = document.getElementById('muteButton');
+            muteButton.addEventListener('click', () => {
+                muteButton.classList.toggle('muted');
+                const isMuted = muteButton.classList.contains('muted');
+                
+                // Toggle mute state
+                game.soundManager.sounds.background.muted = isMuted;
+                Object.values(game.soundManager.sounds).forEach(sound => {
+                    sound.muted = isMuted;
+                });
+                
+                // Update icon
+                muteButton.innerHTML = isMuted 
+                    ? '<i class="fas fa-volume-mute"></i>' 
+                    : '<i class="fas fa-volume-up"></i>';
+            });
+
+            // Initialize game with selected character
+            const characterId = localStorage.getItem('selectedCharacter');
+            initGame(characterId);
+            
+            // Start background music
+            game.soundManager.play('background');
+
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw player
+                ctx.fillStyle = '#e63946';
+                ctx.fillRect(player1.x, player1.y, 30, 30);
+                
+                // Draw enemies
+                game.enemies.forEach(enemy => {
+                    ctx.fillStyle = '#4a4e69';
+                    ctx.fillRect(enemy.x, enemy.y, 30, 30);
+                    
+                    // Draw enemy health bar
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(enemy.x, enemy.y - 10, 30, 5);
+                    ctx.fillStyle = '#d90429';
+                    ctx.fillRect(enemy.x, enemy.y - 10, 30 * (enemy.health / enemy.maxHealth), 5);
+                });
+                
+                // Draw safe zone
+                ctx.beginPath();
+                ctx.arc(game.safeZone.x, game.safeZone.y, game.safeZone.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = '#4cc9f0';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // Update and draw game objects (bullets)
+                for (let i = game.gameObjects.length - 1; i >= 0; i--) {
+                    const obj = game.gameObjects[i];
+                    obj.update();
+                    obj.draw(ctx);
+                    
+                    // Remove marked objects
+                    if (obj.shouldRemove) {
+                        game.gameObjects.splice(i, 1);
+                    }
+                }
+                
+                // Update UI
+                if (player1.currentWeapon) {
+                    document.getElementById('ammoCounter').textContent = 
+                        `${player1.currentWeapon.ammo}/${player1.currentWeapon.maxAmmo}`;
+                }
+                
+                // Update health bar
+                document.getElementById('healthBar').style.width = 
+                    `${(player1.health / player1.maxHealth) * 100}%`;
+                
+                requestAnimationFrame(render);
+            }
+            
+            render();
+            
+            // Controls
+            window.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'w': case 'ArrowUp': player1.move('up'); break;
+                    case 's': case 'ArrowDown': player1.move('down'); break;
+                    case 'a': case 'ArrowLeft': player1.move('left'); break;
+                    case 'd': case 'ArrowRight': player1.move('right'); break;
+                    case '1': case '2': case '3': case '4': case '5': 
+                        const weaponIndex = parseInt(e.key) - 1;
+                        if (weaponIndex < player1.weapons.length) {
+                            player1.currentWeaponIndex = weaponIndex;
+                            player1.currentWeapon = player1.weapons[weaponIndex];
+                            player1.updateWeaponUI();
+                        }
+                        break;
+                    case 'q': 
+                        player1.switchWeapon(-1); // Previous weapon
+                        break;
+                    case 'e': 
+                        player1.switchWeapon(1); // Next weapon
+                        break;
+                    case 'r':
+                        if (player1.currentWeapon) {
+                            player1.currentWeapon.reload();
+                            player1.updateWeaponUI();
+                        }
+                        break;
+                }
+            });
+            
+            window.addEventListener('keyup', (e) => {
+                player1.stopMoving();
+            });
+
+            // Mouse controls
+            canvas.addEventListener('mousedown', (e) => {
+                if (player1.currentWeapon) {
+                    const currentTime = Date.now();
+                    const damage = player1.currentWeapon.fire(currentTime);
+                    if (damage > 0) {
+                        // Get mouse position relative to canvas
+                        const rect = canvas.getBoundingClientRect();
+                        const mouseX = e.clientX - rect.left;
+                        const mouseY = e.clientY - rect.top;
+                        
+                        // Calculate bullet direction
+                        const angle = Math.atan2(mouseY - player1.y, mouseX - player1.x);
+                        
+                        // Add bullet to game
+                        game.gameObjects.push({
+                            x: player1.x + 15,
+                            y: player1.y + 15,
+                            vx: Math.cos(angle) * 15,
+                            vy: Math.sin(angle) * 15,
+                            damage: damage,
+                            update: function() {
+                                this.x += this.vx;
+                                this.y += this.vy;
+                                
+                                // Check for collisions with enemies
+                                game.players.forEach(player => {
+                                    if (player !== player1) {
+                                        const dx = this.x - player.x;
+                                        const dy = this.y - player.y;
+                                        const distance = Math.sqrt(dx*dx + dy*dy);
+                                        if (distance < 20) {
+                                            player.takeDamage(this.damage);
+                                            this.shouldRemove = true;
+                                        }
+                                    }
+                                });
+                                
+                                // Remove if out of bounds
+                                if (this.x < 0 || this.x > canvas.width || 
+                                    this.y < 0 || this.y > canvas.height) {
+                                    this.shouldRemove = true;
+                                }
+                            },
+                            draw: function(ctx) {
+                                ctx.fillStyle = '#ffcc00';
+                                ctx.beginPath();
+                                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
