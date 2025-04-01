@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREE GUY 1</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/highscores.css">
+    <link rel="stylesheet" href="styles/boss.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="1200" height="800"></canvas>
+
+    <!-- Player UI -->
+    <div class="health-bar">
+        <div class="health-fill" id="healthBar"></div>
+    </div>
+    <div class="ammo-counter" id="ammoCounter">30/30</div>
+    <div class="score-display" id="scoreDisplay">0</div>
+    <button id="muteButton" class="mute-button">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <!-- Boss UI -->
+    <div id="bossHealthContainer" class="boss-health-container">
+        <div id="bossHealthBar" class="boss-health-bar"></div>
+        <div id="bossHealthText" class="boss-health-text">100%</div>
+    </div>
+
+    <!-- Wave Announcements -->
+    <div id="waveAnnouncement" class="wave-announcement">
+        <h1>WAVE <span id="waveNumber">1</span></h1>
+    </div>
+    <div id="bossAnnouncement" class="boss-announcement">
+        <h1>BOSS WAVE!</h1>
+        <h2>WAVE <span id="bossWaveNumber">1</span></h2>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="game-over-screen">
+        <div class="game-over-content">
+            <h1 id="gameOverText">GAME OVER</h1>
+            <div class="stats-container">
+                <div class="stat">
+                    <span class="stat-label">Final Score:</span>
+                    <span class="stat-value" id="finalScore">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Wave Reached:</span>
+                    <span class="stat-value" id="finalWave">1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Enemies Defeated:</span>
+                    <span class="stat-value" id="finalKills">0</span>
+                </div>
+            </div>
+            <div id="highScoresContainer" class="high-scores"></div>
+            <div class="button-container">
+                <button id="restartButton" class="menu-button">Play Again</button>
+                <button id="menuButton" class="menu-button">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Input Dialog -->
+    <div id="nameInputDialog" class="name-input-dialog" style="display:none;">
+        <div class="name-input-container">
+            <h3>NEW HIGH SCORE!</h3>
+            <p>Enter your name:</p>
+            <input type="text" id="playerNameInput" maxlength="15" autofocus>
+            <div>
+                <button id="submitScoreButton">Submit</button>
+                <button id="cancelScoreButton">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/game.js" type="module"></script>
+</body>
+</html>
