@@ -1,0 +1,57 @@
+/* Boss Wave Styles */
+.boss-announcement {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #e63946;
+    font-size: 72px;
+    text-align: center;
+    text-shadow: 0 0 15px #000;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+}
+
+.boss-announcement h2 {
+    font-size: 48px;
+    margin-top: 20px;
+    color: #4cc9f0;
+}
+
+.boss-announcement.show {
+    opacity: 1;
+}
+
+/* Boss Health Bar */
+.boss-health-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    background-color: rgba(0,0,0,0.7);
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+    z-index: 900;
+}
+
+.boss-health-bar {
+    height: 20px;
+    background-color: #e63946;
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.boss-health-text {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
